@@ -22,13 +22,17 @@ interface Run {
   inverse: boolean
 }
 
-function runs(cells: DisplayCell[]): Run[] {
-  const out: Run[] = []
-  for (const c of cells) {
+/** Glyphs missing from IBM Plex Mono; drawn one cell at a time so a fallback font cannot shift the grid. */
+const OUTSIDE_FONT = new Set(['□', 'Δ'])
+
+function runs(cells: DisplayCell[]): (Run & { col: number })[] {
+  const out: (Run & { col: number })[] = []
+  cells.forEach((c, col) => {
     const last = out[out.length - 1]
-    if (last && last.color === c.color && last.size === c.size && last.inverse === c.inverse) last.text += c.ch
-    else out.push({ text: c.ch, color: c.color, size: c.size, inverse: c.inverse })
-  }
+    const single = OUTSIDE_FONT.has(c.ch)
+    if (!single && last && !OUTSIDE_FONT.has(last.text) && last.color === c.color && last.size === c.size && last.inverse === c.inverse) last.text += c.ch
+    else out.push({ text: c.ch, color: c.color, size: c.size, inverse: c.inverse, col })
+  })
   return out
 }
 
@@ -49,23 +53,47 @@ export const CduDisplay = memo(function CduDisplay({ grid, fontSize, rowHeight, 
         const legId = line.fields?.L?.legId ?? line.fields?.R?.legId
         const highlighted = !!legId && legId === highlightedLegId
         const content = (
-          <View style={{ height: rowHeight, flexDirection: 'row', alignItems: 'center', backgroundColor: highlighted ? 'rgba(242,226,90,0.10)' : undefined }}>
-            {runs(line.cells).map((r, j) => (
-              <Text
-                key={j}
-                allowFontScaling={false}
-                style={{
-                  width: r.text.length * charWidth,
-                  fontFamily: fonts.mono,
-                  fontSize: r.size === 'S' ? fontSize * 0.78 : fontSize,
-                  color: r.inverse ? colors.cdu.screen : COLOR[r.color],
-                  backgroundColor: r.inverse ? colors.cdu.white : undefined,
-                  includeFontPadding: false,
-                }}
-              >
-                {r.text}
-              </Text>
-            ))}
+          <View style={{ height: rowHeight, width: line.cells.length * charWidth, backgroundColor: highlighted ? 'rgba(242,226,90,0.10)' : undefined }}>
+            {runs(line.cells).map((r, j) => {
+              const size = r.size === 'S' ? fontSize * 0.78 : fontSize
+              if (r.text === '□') {
+                // Entry box: drawn as an outlined square so it keeps the column width exactly.
+                const box = Math.min(charWidth * 0.82, size * 0.62)
+                return (
+                  <View
+                    key={j}
+                    style={{ position: 'absolute', left: r.col * charWidth + (charWidth - box) / 2, top: (rowHeight - box) / 2, width: box, height: box, borderWidth: 1.2, borderColor: COLOR[r.color] }}
+                  />
+                )
+              }
+              return r.text.trim() === '' && !r.inverse ? null : (
+                <Text
+                  key={j}
+                  allowFontScaling={false}
+                  // Each run sits on its own column; one column of slack lets the last glyph render even when
+                  // the font's measured advance is a hair wider than the grid (Android drops clipped glyphs).
+                  numberOfLines={1}
+                  ellipsizeMode="clip"
+                  style={{
+                    position: 'absolute',
+                    left: r.col * charWidth,
+                    top: 0,
+                    height: rowHeight,
+                    width: (r.text.length + (r.inverse || OUTSIDE_FONT.has(r.text) ? 0 : 1)) * charWidth,
+                    textAlign: OUTSIDE_FONT.has(r.text) ? 'center' : 'left',
+                    textAlignVertical: 'center',
+                    lineHeight: rowHeight,
+                    fontFamily: OUTSIDE_FONT.has(r.text) ? undefined : fonts.mono,
+                    fontSize: size,
+                    color: r.inverse ? colors.cdu.screen : COLOR[r.color],
+                    backgroundColor: r.inverse ? colors.cdu.white : undefined,
+                    includeFontPadding: false,
+                  }}
+                >
+                  {r.text}
+                </Text>
+              )
+            })}
           </View>
         )
         return line.kind === 'data' && onLine && (line.fields?.L || line.fields?.R) ? (

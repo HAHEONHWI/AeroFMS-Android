@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { formatFlightLevel, isLeg } from '@aerofms/shared'
+import { formatAltitude, isLeg } from '@aerofms/shared'
 import type { FmsEvent, FmsState } from '@aerofms/core'
 import { GLOSSARY } from '@aerofms/training'
 import { Button, Segmented, Sheet } from '@/components/common/UI'
@@ -66,7 +66,7 @@ export function FlightDataPanel({ state }: { state: FmsState }) {
       <Text style={ui.h2}>{t('emulator.flightData')}</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         <Datum label={t('emulator.phase')} value={t(`phase.${state.flightPhase}`)} />
-        <Datum label={t('emulator.altitude')} value={`${formatFlightLevel(p.altitudeFt, state.performance.transitionAltitudeFt ?? 18000)} ft`} />
+        <Datum label={t('emulator.altitude')} value={formatAltitude(p.altitudeFt, state.performance.transitionAltitudeFt ?? 18000)} />
         <Datum label={t('emulator.groundSpeed')} value={`${Math.round(p.groundSpeedKt)} kt`} />
         <Datum label={t('emulator.airspeed')} value={`${Math.round(s.indicatedAirspeedKt)} / M${s.mach.toFixed(2)}`} />
         <Datum label={t('emulator.verticalSpeed')} value={`${s.verticalSpeedFpm} fpm`} />

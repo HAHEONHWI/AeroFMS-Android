@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { router } from 'expo-router'
+import { useCallback } from 'react'
+import { router, useFocusEffect } from 'expo-router'
 import { Image, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { formatRelative } from '@aerofms/i18n'
@@ -7,7 +8,7 @@ import { BUILTIN_LESSONS, BUILTIN_SCENARIOS } from '@aerofms/training'
 import { Badge, Button, Card, Screen } from '@/components/common/UI'
 import { AdBanner } from '@/platform/ads'
 import { colors, fonts, ui } from '@/theme'
-import { services , APP_VERSION } from '@/services/runtime'
+import { services, APP_VERSION } from '@/services/runtime'
 import { currentLanguage, useLocalized } from '@/i18n'
 import { useConnector } from '@/components/emulator/ConnectorPanel'
 import { useRemote } from '@/stores/remote'
@@ -18,11 +19,22 @@ export default function HomeScreen() {
   const L = useLocalized()
   const s = services()
   const sessions = useQuery({ queryKey: ['sessions', 'all'], queryFn: () => s.sessions.list() })
+  const current = useQuery({ queryKey: ['sessions', 'current'], queryFn: () => s.sessions.currentSessionId().then((id) => id ?? null) })
   const progress = useQuery({ queryKey: ['progress'], queryFn: () => s.progress.list() })
   const plans = useQuery({ queryKey: ['flightPlans'], queryFn: () => s.flightPlans.list() })
   const connector = useConnector((c) => c.status)
   const remote = useRemote((r) => r.config)
-  const recent = sessions.data?.[0]
+  // The open session first; otherwise the most recently updated one.
+  const recent = sessions.data?.find((x) => x.id === current.data) ?? sessions.data?.[0]
+  // Tabs stay mounted, so refresh session data whenever Home becomes visible again.
+  const { refetch: refetchSessions } = sessions
+  const { refetch: refetchCurrent } = current
+  useFocusEffect(
+    useCallback(() => {
+      void refetchSessions()
+      void refetchCurrent()
+    }, [refetchSessions, refetchCurrent]),
+  )
   const done = new Set((progress.data ?? []).filter((p) => p.status === 'COMPLETED').map((p) => p.lessonId))
   const nextLesson = BUILTIN_LESSONS.find((l) => !done.has(l.id)) ?? BUILTIN_LESSONS[0]
   const notice = currentLanguage() === 'ko' ? remote.noticeKo : remote.noticeEn

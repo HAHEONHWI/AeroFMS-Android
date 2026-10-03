@@ -98,7 +98,13 @@ export function FlightMapSvg({ state, nav, adapter, width, height, showAirways =
     const cos = Math.cos((((b[1] + b[3]) / 2) * Math.PI) / 180)
     const spanX = Math.max(0.3, (b[2] - b[0]) * cos)
     const spanY = Math.max(0.3, b[3] - b[1])
-    setView({ lon: (b[0] + b[2]) / 2, lat: (b[1] + b[3]) / 2, k: Math.min(2000, Math.min((width - 60) / spanX, (height - 60) / spanY)) })
+    // Keep the route clear of the overlay buttons along the top edge.
+    const padX = 40
+    const padTop = 100
+    const padBottom = 40
+    const k = Math.min(2000, Math.min((width - 2 * padX) / spanX, (height - padTop - padBottom) / spanY))
+    const centerY = (padTop + height - padBottom) / 2
+    setView({ lon: (b[0] + b[2]) / 2, lat: (b[1] + b[3]) / 2 + (centerY - height / 2) / k, k })
   }
   const key = `${state.session.sessionId}:${displayedPlan(state).origin}:${displayedPlan(state).destination}`
   useEffect(() => {

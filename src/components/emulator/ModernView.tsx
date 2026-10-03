@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { formatDurationHm, formatFlightLevel, isLeg, kgToLb, lbToKg, unitPreferences } from '@aerofms/shared'
+import { formatDurationHm, formatFlightLevel, isLeg, kgToLb, lbToKg, legDetail, unitPreferences } from '@aerofms/shared'
 import { computeVnavProfile, displayedPerformance, displayedPlan, hasModification, procedureRunways } from '@aerofms/core'
 import type { FmsCommand, FmsState } from '@aerofms/core'
 import { Button, Card, Field, Select, toast } from '@/components/common/UI'
@@ -153,11 +153,7 @@ export function ModernView({ state }: { state: FmsState }) {
             <View key={e.id} style={[ui.row, { justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 6, opacity: e.missed ? 0.6 : 1 }]}>
               <Pressable style={{ flex: 1 }} onPress={() => dispatch({ type: 'HIGHLIGHT_LEG', legId: e.id })} accessibilityRole="button">
                 <Text style={{ fontFamily: fonts.monoSemi, color: i === plan.activeLegIndex ? colors.cdu.magenta : colors.text }}>{e.waypoint.ident}</Text>
-                <Text style={ui.faint}>
-                  {e.via ?? ''}
-                  {e.calculatedDistance !== undefined ? ` · ${e.calculatedDistance} NM` : ''}
-                  {profile?.legs.find((p) => p.legId === e.id) ? ` · ${formatFlightLevel(profile.legs.find((p) => p.legId === e.id)?.altitudeFt ?? 0, perf.transitionAltitudeFt ?? 18000)}` : ''}
-                </Text>
+                <Text style={ui.faint}>{legDetail(e, profile?.legs.find((p) => p.legId === e.id)?.altitudeFt, perf.transitionAltitudeFt ?? 18000)}</Text>
               </Pressable>
               {i > 0 && e.segment !== 'ORIGIN' && !e.missed ? (
                 <View style={ui.row}>

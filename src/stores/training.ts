@@ -6,14 +6,15 @@ import { getFirebase } from '@/platform/firebase'
 import { adService } from '@/platform/ads'
 import { ScenarioCloud } from '@aerofms/cloud'
 import { services } from '@/services/runtime'
+import i18n, { localize } from '@/i18n'
 import { track } from '@/services/analytics'
 import { onEngineUpdate, useFms } from './fms'
 import { useSettings } from './settings'
 import { useAuth } from './auth'
 
 type Active =
-  | { kind: 'LESSON'; lesson: Lesson; runner: LessonRunner }
-  | { kind: 'SCENARIO'; scenario: Scenario; runner: ScenarioRunner; cloud: boolean }
+  | { kind: 'LESSON'; lesson: Lesson; runner: LessonRunner; sessionId: string }
+  | { kind: 'SCENARIO'; scenario: Scenario; runner: ScenarioRunner; cloud: boolean; sessionId: string }
 
 interface TrainingStore {
   active?: Active
@@ -30,10 +31,25 @@ interface TrainingStore {
 }
 
 let unsub: (() => void) | undefined
+let unsubSession: (() => void) | undefined
 
 export const useTraining = create<TrainingStore>((set, get) => {
+  const reset = () => {
+    unsub?.()
+    unsub = undefined
+    unsubSession?.()
+    unsubSession = undefined
+    set({ active: undefined, feedback: [], latest: undefined, result: undefined })
+  }
+
   const observe = () => {
     unsub?.()
+    unsubSession?.()
+    // Training belongs to the session it created; opening another session ends it.
+    unsubSession = useFms.subscribe((fms) => {
+      const a = get().active
+      if (a && fms.state && fms.state.session.sessionId !== a.sessionId) reset()
+    })
     unsub = onEngineUpdate((u) => {
       const a = get().active
       if (!a || u.state.session.sessionId !== useFms.getState().state?.session.sessionId) return
@@ -86,7 +102,7 @@ export const useTraining = create<TrainingStore>((set, get) => {
       const s = services()
       const adapter = s.registry.get(lesson.aircraftId)
       if (!adapter) return
-      await prepareSession(lesson.aircraftId, `Lesson · ${lesson.id}`, lesson.setup)
+      await prepareSession(lesson.aircraftId, i18n.t('training.sessionNameLesson', { title: localize(lesson.title) }), lesson.setup)
       const runner = new LessonRunner(lesson, adapter, s.nav, useSettings.getState().settings.trainingLevel)
       const st = useFms.getState().state
       if (st) runner.sync(st)
@@ -100,7 +116,7 @@ export const useTraining = create<TrainingStore>((set, get) => {
         completedAt: prev?.completedAt,
         updatedAt: Date.now(),
       })
-      set({ active: { kind: 'LESSON', lesson, runner }, feedback: [], latest: undefined, result: undefined, revision: get().revision + 1 })
+      set({ active: { kind: 'LESSON', lesson, runner, sessionId: st?.session.sessionId ?? '' }, feedback: [], latest: undefined, result: undefined, revision: get().revision + 1 })
       observe()
       track('lesson_started', { lesson_id: lesson.id, aircraft_id: lesson.aircraftId })
     },
@@ -108,9 +124,9 @@ export const useTraining = create<TrainingStore>((set, get) => {
       const s = services()
       const adapter = s.registry.get(scenario.aircraftId)
       if (!adapter) return
-      await prepareSession(scenario.aircraftId, `Scenario · ${scenario.id}`, scenario.setup)
+      await prepareSession(scenario.aircraftId, i18n.t('training.sessionNameScenario', { title: localize(scenario.title) }), scenario.setup)
       const runner = new ScenarioRunner(scenario, adapter, s.nav)
-      set({ active: { kind: 'SCENARIO', scenario, runner, cloud: !!opts.cloud }, feedback: [], latest: undefined, result: undefined, revision: get().revision + 1 })
+      set({ active: { kind: 'SCENARIO', scenario, runner, cloud: !!opts.cloud, sessionId: useFms.getState().state?.session.sessionId ?? '' }, feedback: [], latest: undefined, result: undefined, revision: get().revision + 1 })
       observe()
       track('scenario_started', { scenario_type: scenario.builtIn ? 'builtin' : 'user', aircraft_id: scenario.aircraftId })
     },
@@ -128,9 +144,7 @@ export const useTraining = create<TrainingStore>((set, get) => {
       // A result interstitial may follow a finished lesson once the user leaves the emulator
       // (policy-gated: disabled by default, never shown while an ad-free screen is open).
       if (get().result) setTimeout(() => void adService().showInterstitial('RESULT_INTERSTITIAL'), 800)
-      unsub?.()
-      unsub = undefined
-      set({ active: undefined, feedback: [], latest: undefined, result: undefined })
+      reset()
     },
   }
 })

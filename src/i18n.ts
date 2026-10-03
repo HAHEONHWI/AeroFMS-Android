@@ -26,6 +26,12 @@ export function applyLanguage(pref: LanguagePreference): AppLanguage {
 
 export const currentLanguage = (): AppLanguage => (i18n.language === 'ko' ? 'ko' : 'en')
 
+/** Non-hook variant of useLocalized for stores and services. */
+export function localize(text: LocalizedText | undefined): string {
+  // eslint-disable-next-line import/no-named-as-default-member -- shared i18next instance
+  return !text ? '' : 'key' in text ? i18n.t(text.key, text.params ?? {}) : text.text
+}
+
 export function useLocalized(): (text: LocalizedText | undefined) => string {
   const { t } = useTranslation()
   return useCallback((text) => (!text ? '' : 'key' in text ? t(text.key, text.params ?? {}) : text.text), [t])

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import type { TextInputProps, ViewStyle } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { create } from 'zustand'
 import { colors, MIN_HIT_TARGET, radius, spacing, ui } from '@/theme'
@@ -137,10 +137,12 @@ export function Select({ label, value, options, onChange }: { label: string; val
 
 export function Sheet({ visible, title, onClose, children, footer }: { visible: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
   const { t } = useTranslation()
+  // Edge-to-edge: keep the footer above the system navigation bar.
+  const insets = useSafeAreaInsets()
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
-      <View style={styles.sheet}>
+      <View style={[styles.sheet, { paddingBottom: spacing.md + insets.bottom }]}>
         <View style={[ui.row, { justifyContent: 'space-between', paddingBottom: spacing.sm }]}>
           <Text style={ui.h2}>{title}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={onClose} style={styles.close}>

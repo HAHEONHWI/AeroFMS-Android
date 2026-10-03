@@ -198,7 +198,7 @@ export default function EmulatorScreen() {
       <SessionSheet visible={sheet === 'sessions'} onClose={() => setSheet(null)} />
       <SwitchAircraftSheet target={switchTarget ?? paramSwitch} onClose={closeSwitch} />
       <ExplainSheet explainKey={explainKey} onClose={() => setExplainKey(null)} onNavigate={setExplainKey} />
-      {settings.viewMode === 'CLASSIC' && !wide ? null : <Text style={[ui.faint, { textAlign: 'center', paddingBottom: 4 }]}>{t('app.disclaimerShort')}</Text>}
+      {settings.viewMode === 'CLASSIC' && !wide ? null : <Text style={[ui.faint, { textAlign: 'center', paddingBottom: 4, paddingHorizontal: 16 }]}>{t('app.disclaimerShort')}</Text>}
     </SafeAreaView>
   )
 }

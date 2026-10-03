@@ -56,6 +56,8 @@ export function CduFrame(p: CduFrameProps) {
     }
     keyH = Math.min(keyH, 50)
   }
+  // Half-pixel font sizes keep the measured glyph advance at or below the column width.
+  fontSize = Math.floor(fontSize * 2) / 2
   const charW = fontSize * ADVANCE
   const execLit = p.adapter.isExecPending(p.state)
   const msgLit = pendingMessages(p.state).length > 0
