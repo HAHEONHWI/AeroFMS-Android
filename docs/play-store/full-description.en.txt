@@ -1,0 +1,31 @@
+AeroFMS is a simulation and training app for learning airliner Flight Management Systems. Program Boeing FMCs and Airbus MCDUs with realistic workflows and see the result instantly on the map and in the built-in flight simulation.
+
+■ 8 aircraft
+Boeing 737-800, 737 MAX 8, 777-300ER, 787-9 / Airbus A320ceo, A320neo, A330-900, A350-900
+
+■ An FMS that behaves like one
+• Origin, destination, airways, SIDs, STARs and approaches
+• Boeing ACT/MOD/EXEC and Airbus temporary flight plans with INSERT/ERASE
+• Discontinuities, DIRECT TO, holds, offsets, altitude and speed constraints
+• Performance entries (ZFW, fuel, cost index, cruise level) with TOC/TOD predictions
+
+■ Built for learning
+• Academy: step-by-step guided lessons with hints
+• Mistake analyzer explains what went wrong and how to fix it
+• Explain mode: tap any field for a glossary explanation
+• Switch between Classic (CDU) and Modern (form) views
+
+■ Scenarios and replay
+• Built-in scenarios with objectives and scores
+• Create your own scenarios and share them with a code
+• Every input is recorded on a timeline you can replay
+
+■ Fly it
+• Built-in simulation flies your flight plan from takeoff to landing
+• Connect to Microsoft Flight Simulator and X-Plane through the AeroFMS Connector on your PC
+
+■ Offline first
+Everything works without an internet connection and each aircraft session is saved on your device. Sign in to optionally sync between devices.
+
+※ AeroFMS is a simulator for training and entertainment only. Do not use it for real-world flight operations or planning. The built-in navigation data is demo data and not current aeronautical information.
+※ Boeing, Airbus and the aircraft names are trademarks of their respective owners. AeroFMS is not affiliated with them.
