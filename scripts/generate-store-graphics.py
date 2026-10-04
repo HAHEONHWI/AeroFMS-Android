@@ -10,10 +10,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H = 1080, 1920
-BG_TOP = (14, 22, 34)
-BG_BOTTOM = (6, 9, 14)
+BG = (11, 16, 24)
 ACCENT = (79, 179, 169)
-AMBER = (246, 178, 61)
 TEXT = (236, 241, 247)
 MUTED = (160, 174, 194)
 BEZEL = (40, 52, 72)
@@ -57,18 +55,9 @@ COPY: dict[str, dict[str, tuple[str, str]]] = {
 }
 
 
-def gradient() -> Image.Image:
-    img = Image.new('RGB', (W, H), BG_TOP)
-    d = ImageDraw.Draw(img)
-    for y in range(H):
-        t = y / (H - 1)
-        d.line([(0, y), (W, y)], fill=tuple(round(a + (b - a) * t) for a, b in zip(BG_TOP, BG_BOTTOM)))
-    # Soft accent glow behind the phone.
-    glow = Image.new('L', (W, H), 0)
-    ImageDraw.Draw(glow).ellipse([W * 0.08, H * 0.42, W * 0.92, H * 1.05], fill=70)
-    glow = glow.filter(ImageFilter.GaussianBlur(160))
-    img.paste(Image.new('RGB', (W, H), ACCENT), (0, 0), glow)
-    return img
+def background() -> Image.Image:
+    """Flat app background colour (no gradients or glows)."""
+    return Image.new('RGB', (W, H), BG)
 
 
 def phone(shot: Image.Image, width: int) -> Image.Image:
@@ -88,7 +77,7 @@ def phone(shot: Image.Image, width: int) -> Image.Image:
 
 
 def render(shot_path: Path, headline: str, subline: str) -> Image.Image:
-    canvas = gradient().convert('RGBA')
+    canvas = background().convert('RGBA')
     d = ImageDraw.Draw(canvas)
     head_font = ImageFont.truetype(FONT, 86, index=BOLD)
     sub_font = ImageFont.truetype(FONT, 40, index=MEDIUM)
