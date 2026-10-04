@@ -24,3 +24,13 @@ adb exec-out screencap -p > screenshot.png
 - 상태 표시줄 정리: 개발자 옵션의 데모 모드(시간 12:00, 배터리 100%, 알림 없음)
 - 폰: Pixel 계열 1080×2400, 태블릿: 1600×2560(10인치), 1200×1920(7인치)
 - 피처 그래픽: 앱 아이콘 + "AeroFMS — FMC & MCDU Simulator" 문구, 실제 CDU 화면 일부
+
+## 스토어 등록용 이미지 생성
+
+원본 스크린샷(`<lang>-NN-<name>.png`, 1080×2160)을 찍은 뒤 헤드라인과 폰 목업을 입힌 등록용 이미지(1080×1920)를 만듭니다. 문구는 스크립트의 `COPY`에서 수정합니다.
+
+```bash
+python3 scripts/generate-store-graphics.py <원본 스크린샷 폴더> <출력 폴더>
+```
+
+피처 그래픽(1024×500)은 Web 저장소의 `scripts/generate-feature-graphic.py`로 만듭니다.
