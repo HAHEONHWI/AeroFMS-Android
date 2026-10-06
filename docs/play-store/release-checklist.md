@@ -8,7 +8,7 @@
 - [ ] `.env`에 프로덕션 Firebase 설정, `EXPO_PUBLIC_ENABLE_DEBUG_TOOLS=false`
 - [ ] 광고 정책 결정: 기본 `AEROFMS_ENABLE_ADS=false` (켜는 경우 privacy/data-safety 갱신)
 - [ ] `google-services.json` 포함 여부 확인(Crashlytics·네이티브 Analytics)
-- [ ] Firebase: 규칙·인덱스·Functions 배포, App Check(Play Integrity) 적용, Remote Config 템플릿 게시
+- [ ] Firebase(`aerofms-app`): `firebase deploy --only firestore,remoteconfig`, Authentication 제공업체 사용 설정, (선택) App Check(Play Integrity)
 
 ## 빌드
 

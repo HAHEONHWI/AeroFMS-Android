@@ -18,7 +18,7 @@
 
 - [ ] 개인정보처리방침 URL이 공개 접근 가능하고 앱 내 문서와 내용이 같다
 - [ ] 개인정보처리방침에 수집 항목, 목적, 보관 기간, 제3자(Google/Firebase), 삭제 방법, 연락처(admin@heonhwi.dev)가 있다
-- [ ] 앱 내 **계정 삭제**(프로필 → 계정 → 계정 삭제)가 동작하고 Firestore 데이터와 Auth 계정이 삭제된다(`deleteAccount` Function)
+- [ ] 앱 내 **계정 삭제**(프로필 → 계정 → 계정 삭제)가 동작하고 Firestore 데이터와 Auth 계정이 삭제된다(클라이언트 처리, 웹 `https://aerofms.netlify.app/account`에서도 가능)
 - [ ] 앱 밖에서 삭제를 요청할 수 있는 웹 경로/이메일을 Play Console "데이터 삭제" 항목에 입력했다
 - [ ] Analytics·Crashlytics는 설정 → 개인정보에서 끌 수 있다
 - [ ] 위치, 연락처, 카메라, 마이크, 저장소 권한을 요청하지 않는다(매니페스트에서 차단)

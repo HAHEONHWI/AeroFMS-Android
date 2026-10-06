@@ -63,7 +63,7 @@ i18n 키 검사는 Web 저장소에서 `EXTRA_I18N_SRC=<Android>/src pnpm check:
 
 | 변수 | 설명 |
 | --- | --- |
-| `EXPO_PUBLIC_FIREBASE_*` | Firebase JS SDK 설정(Auth·Firestore·Functions) |
+| `EXPO_PUBLIC_FIREBASE_*` | Firebase JS SDK 설정(Auth·Firestore). 프로젝트 `aerofms-app` |
 | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` | Google 로그인(Credential Manager)용 웹 OAuth 클라이언트 ID |
 | `AEROFMS_ENABLE_ADS` | `true`일 때만 Google Mobile Ads SDK를 링크(기본 `false`) |
 | `AEROFMS_ADMOB_*` | AdMob 앱/광고 단위 ID(미지정 시 Google 테스트 ID) |

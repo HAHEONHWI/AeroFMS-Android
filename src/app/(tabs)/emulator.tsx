@@ -174,7 +174,8 @@ export default function EmulatorScreen() {
       {explainMode ? <Text style={{ color: colors.accent, paddingHorizontal: 10, marginBottom: 4 }}>{t('emulator.explainOn')}</Text> : null}
       {wide ? (
         <View style={{ flex: 1, flexDirection: 'row', gap: 12, paddingHorizontal: 6 }}>
-          {main}
+          {/* The CDU keeps its natural height; the Modern view scrolls and needs the full column. */}
+          <View style={{ alignSelf: settings.viewMode === 'MODERN' ? 'stretch' : 'flex-start' }}>{main}</View>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 12, paddingBottom: 24 }}>
             <Segmented label={t('emulator.panel')} value={panel} options={panels} onChange={setPanel} />
             {training.active && panel !== 'training' ? <TrainingOverlay onExit={() => setPanel('map')} /> : null}
