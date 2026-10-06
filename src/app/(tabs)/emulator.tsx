@@ -72,6 +72,12 @@ export default function EmulatorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.lesson, params.scenario, params.session, params.aircraft])
 
+  // Bring back a lesson/scenario that was running in this session before the app was closed.
+  const sessionId = state?.session.sessionId
+  useEffect(() => {
+    if (sessionId) void useTraining.getState().resume(sessionId)
+  }, [sessionId])
+
   const paramSwitch = params.aircraft && state && state.aircraft.aircraftId !== params.aircraft ? params.aircraft : null
   const closeSwitch = () => {
     setSwitchTarget(null)

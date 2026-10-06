@@ -25,7 +25,7 @@ interface Run {
 /** Glyphs missing from IBM Plex Mono; drawn one cell at a time so a fallback font cannot shift the grid. */
 const OUTSIDE_FONT = new Set(['□', 'Δ'])
 
-function runs(cells: DisplayCell[]): (Run & { col: number })[] {
+export function runs(cells: DisplayCell[]): (Run & { col: number })[] {
   const out: (Run & { col: number })[] = []
   cells.forEach((c, col) => {
     const last = out[out.length - 1]

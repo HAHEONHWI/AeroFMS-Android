@@ -52,7 +52,7 @@ export default function SettingsScreen() {
       <Card>
         <Text style={ui.h2}>{t('settings.navData')}</Text>
         <Text style={ui.mono}>{nav.meta.cycle}</Text>
-        <Text style={ui.faint}>{nav.meta.source}</Text>
+        <Text style={ui.faint}>{nav.meta.isDemo ? t('settings.navDataDemoSource') : nav.meta.source}</Text>
         <Button
           title={t('settings.navDataReimport')}
           onPress={async () => {

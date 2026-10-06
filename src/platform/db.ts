@@ -65,7 +65,7 @@ export async function openDeviceDatabase(): Promise<{ driver: ExpoSqliteDriver; 
     const check = await db.getFirstAsync<{ integrity_check: string }>('PRAGMA integrity_check')
     if (check && check.integrity_check !== 'ok') throw new Error('integrity_check failed')
   } catch {
-    // Keep the damaged file for support and start with a fresh database.
+    // The file cannot be opened or failed the integrity check: start over with a fresh database.
     recovered = true
     try {
       await SQLite.deleteDatabaseAsync(DB_NAME)
