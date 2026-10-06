@@ -44,13 +44,13 @@ export default function ScenariosScreen() {
   const mine = useQuery({ queryKey: ['scenarios', 'local'], queryFn: () => services().scenarios.list() })
   useFocusEffect(() => void mine.refetch())
   const fb = getFirebase()
-  const community = useQuery({ queryKey: ['scenarios', 'public'], queryFn: () => (fb ? new ScenarioCloud(fb.db, fb.functions).listPublic() : Promise.resolve([])), enabled: !!fb, retry: false })
+  const community = useQuery({ queryKey: ['scenarios', 'public'], queryFn: () => (fb ? new ScenarioCloud(fb.db).listPublic() : Promise.resolve([])), enabled: !!fb, retry: false })
   const join = async () => {
     const c = code.trim().toUpperCase()
     if (!SHARE_CODE_PATTERN.test(c)) return setErr(t('scenarios.codeInvalid'))
     if (!fb) return setErr(t('common.cloudUnavailable'))
     try {
-      const found = await new ScenarioCloud(fb.db, fb.functions).getByCode(c)
+      const found = await new ScenarioCloud(fb.db).getByCode(c)
       if (!found) return setErr(t('scenarios.codeNotFound'))
       await services().scenarios.save(found.scenario, 'CLOUD')
       router.push(`/scenario/${found.scenario.id}`)

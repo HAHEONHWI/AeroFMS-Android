@@ -20,7 +20,7 @@ async function load(id: string, cloud: boolean): Promise<{ scenario: Scenario; s
   if (local && !cloud) return { scenario: local.doc, source: local.source }
   const fb = getFirebase()
   if (fb) {
-    const r = await new ScenarioCloud(fb.db, fb.functions).get(id).catch(() => null)
+    const r = await new ScenarioCloud(fb.db).get(id).catch(() => null)
     if (r) {
       await services().scenarios.save(r.scenario, 'CLOUD')
       return { scenario: r.scenario, source: 'CLOUD' }
@@ -44,10 +44,10 @@ export default function ScenarioDetail() {
   const share = async () => {
     if (!fb || !user) return toast(t('scenarios.loginToShare'), 'error')
     try {
-      const c = new ScenarioCloud(fb.db, fb.functions)
+      const c = new ScenarioCloud(fb.db)
       const updated: Scenario = { ...scenario, visibility: scenario.visibility === 'PRIVATE' ? 'UNLISTED' : scenario.visibility, authorUid: user.uid, authorName: user.displayName }
       await c.save(user.uid, user.displayName, updated)
-      const code = await c.share(scenario.id)
+      const code = await c.share(user.uid, scenario.id)
       await services().scenarios.save({ ...updated, shareCode: code }, 'LOCAL')
       toast(`${t('scenarios.shareCode')}: ${code}`, 'success')
       void q.refetch()

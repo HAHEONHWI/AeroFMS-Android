@@ -6,11 +6,15 @@ import { useTranslation } from 'react-i18next'
 import { CduFrame } from '@/components/cdu/CduFrame'
 import { FlightMapSvg } from '@/components/map/FlightMapSvg'
 import { EventRow } from '@/components/emulator/Panels'
-import { Button, Segmented } from '@/components/common/UI'
+import { Button, Segmented, toast } from '@/components/common/UI'
 import { colors, ui } from '@/theme'
 import { services } from '@/services/runtime'
 import { useAdFreeContext } from '@/platform/ads'
 import { track } from '@/services/analytics'
+import { createId } from '@aerofms/shared'
+import { uploadReplay } from '@aerofms/cloud'
+import { getFirebase } from '@/platform/firebase'
+import { useAuth } from '@/stores/auth'
 
 const SPEEDS = ['0.5', '1', '2', '4'] as const
 
@@ -19,6 +23,7 @@ export default function ReplayPlayer() {
   const { id = '' } = useLocalSearchParams<{ id: string }>()
   const { width } = useWindowDimensions()
   useAdFreeContext('REPLAY')
+  const user = useAuth((a) => a.user)
   const q = useQuery({ queryKey: ['replay', id], queryFn: () => services().sessions.loadReplay(id).then((r) => r ?? null) })
   const ctrl = q.data
   /** null = the final state (a replay opens at the end of the recording). */
@@ -68,6 +73,24 @@ export default function ReplayPlayer() {
         <Button small title="−1" onPress={() => step(-1)} />
         <Button small title="+1" onPress={() => step(1)} />
         <Button small title="+10" onPress={() => step(10)} />
+        {getFirebase() && user ? (
+          <Button
+            small
+            title={t('replay.shareCloud')}
+            onPress={async () => {
+              const fb = getFirebase()
+              if (!fb) return
+              try {
+                const data = await services().sessions.export(id)
+                if (!data) throw new Error(t('replay.notAvailable'))
+                await uploadReplay(fb.db, user.uid, { id: createId('r-'), sessionId: id, title: state.session.name, aircraftId: state.aircraft.aircraftId, actionCount: data.actions.length, payload: data })
+                toast(t('replay.uploaded'), 'success')
+              } catch (e) {
+                toast(e instanceof Error && e.message === 'REPLAY_TOO_LARGE' ? t('replay.tooLarge') : e instanceof Error ? e.message : String(e), 'error')
+              }
+            }}
+          />
+        ) : null}
       </View>
       <Segmented label={t('replay.speed')} value={speed} onChange={setSpeed} options={SPEEDS.map((s) => ({ value: s, label: `${s}×` }))} />
       <Text style={ui.mono}>{t('replay.position', { current: pos, total: ctrl.length })}</Text>

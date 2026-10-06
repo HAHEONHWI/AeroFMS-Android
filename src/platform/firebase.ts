@@ -1,28 +1,18 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
 import type { FirebaseApp } from 'firebase/app'
- 
 import { getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth'
 import type { Auth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import type { Firestore } from 'firebase/firestore'
-import { getFunctions } from 'firebase/functions'
-import type { Functions } from 'firebase/functions'
-import { getStorage } from 'firebase/storage'
-import type { FirebaseStorage } from 'firebase/storage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { readFirebaseConfig } from '@aerofms/cloud'
 import type { FirebaseClientConfig } from '@aerofms/cloud'
-
-/** Must match firebase/functions deployment region. */
-export const FUNCTIONS_REGION = 'asia-northeast3'
 
 export interface FirebaseServices {
   config: FirebaseClientConfig
   app: FirebaseApp
   auth: Auth
   db: Firestore
-  functions: Functions
-  storage: FirebaseStorage
 }
 
 let cached: FirebaseServices | null | undefined
@@ -51,6 +41,6 @@ export function getFirebase(): FirebaseServices | null {
   } catch {
     auth = getAuth(app)
   }
-  cached = { config, app, auth, db: getFirestore(app), functions: getFunctions(app, FUNCTIONS_REGION), storage: getStorage(app) }
+  cached = { config, app, auth, db: getFirestore(app) }
   return cached
 }
