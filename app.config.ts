@@ -53,7 +53,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'android.permission.SYSTEM_ALERT_WINDOW',
       'android.permission.FOREGROUND_SERVICE',
       'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
-      ...(adsNative ? [] : ['com.google.android.gms.permission.AD_ID']),
+      // Advertising identifiers (incl. Privacy Sandbox permissions pulled in by Firebase Analytics) only in ad builds.
+      ...(adsNative ? [] : ['com.google.android.gms.permission.AD_ID', 'android.permission.ACCESS_ADSERVICES_AD_ID', 'android.permission.ACCESS_ADSERVICES_ATTRIBUTION']),
     ],
     ...(nativeFirebase ? { googleServicesFile: GOOGLE_SERVICES } : {}),
   },

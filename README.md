@@ -69,7 +69,7 @@ i18n 키 검사는 Web 저장소에서 `EXTRA_I18N_SRC=<Android>/src pnpm check:
 | `AEROFMS_ADMOB_*` | AdMob 앱/광고 단위 ID(미지정 시 Google 테스트 ID) |
 | `AEROFMS_VERSION_CODE` | Play 업로드용 versionCode |
 
-`google-services.json`을 프로젝트 루트에 두면 React Native Firebase(Crashlytics, 네이티브 Analytics)가 자동으로 활성화됩니다. 파일이 없으면 해당 네이티브 모듈은 링크되지 않습니다(`react-native.config.js`).
+`google-services.json`을 프로젝트 루트에 두면 React Native Firebase(Crashlytics, 네이티브 Analytics)가 자동으로 활성화됩니다. 파일이 없으면 해당 네이티브 모듈은 링크되지 않습니다(`react-native.config.js`). `firebase.json`이 두 SDK의 자동 수집을 꺼 두므로, 사용자가 설정 → 개인정보에서 켜기 전에는 아무것도 전송되지 않습니다. 현재 Firebase 프로젝트는 `aerofms-app`이며 `google-services.json`은 Git에서 제외됩니다(Firebase 콘솔 → 프로젝트 설정 → AeroFMS Android에서 다시 받을 수 있음).
 
 ## 릴리스 빌드 (AAB)
 
